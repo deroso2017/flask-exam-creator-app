@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">
+    Wrong Questions
+</h1>
+
+{% for q in questions %}
+<div class="bg-white p-6 rounded shadow mb-6">
+    <h2 class="font-bold mb-4">
+        {{ q.question }}
+    </h2>
+
+    <p class="mb-2">
+        Correct Answer:
+        {{ q.correct_answer }}
+    </p>
+
+    <p class="text-gray-600">
+        {{ q.explanation }}
+    </p>
+</div>
+{% endfor %}
+{% endblock %}

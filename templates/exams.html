@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">
+        Create Exam
+    </h1>
+
+    <form method="POST">
+        <!-- EXAM SELECTION -->
+        <label class="block mb-2 font-semibold">
+            Select Exam
+        </label>
+
+        <select name="exam_id" class="border p-2 w-full mb-5">
+
+            {% for exam in exams %}
+                <option value="{{ exam.id }}">
+                    {{ exam.title }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+        <!-- EXAM TYPE -->
+        <label class="block mb-2 font-semibold">
+            Exam Type
+        </label>
+
+        <select name="exam_type" class="border p-2 w-full mb-5">
+
+            <option value="all">All Questions</option>
+            <option value="wrong">Wrong Questions Only</option>
+            <option value="unanswered">Unanswered Questions</option>
+
+        </select>
+
+        <!-- NUMBER OF QUESTIONS -->
+        <label class="block mb-2 font-semibold">
+            Number of Questions
+        </label>
+
+        <input
+            type="number"
+            name="count"
+            value="10"
+            min="1"
+            class="border p-2 w-full mb-6"
+        >
+
+        <!-- SUBMIT -->
+        <button
+            type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded w-full"
+        >
+            Start Exam
+        </button>
+
+    </form>
+
+</div>
+{% endblock %}

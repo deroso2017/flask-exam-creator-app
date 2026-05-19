@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+
+  <table class="w-full border">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-3">Date</th>
+        <th class="p-3">Exam Type</th>
+        <th class="p-3">Score</th>
+        <th class="p-3">Result</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for r in results %}
+
+      <tr class="border-t">
+        <td class="p-3">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td class="p-3">{{ r.exam_type }}</td>
+        <td class="p-3">{{ r.score }}%</td>
+        <td class="p-3">
+          {% if r.passed %}
+          <span class="text-green-600"> Passed </span>
+          {% else %}
+          <span class="text-red-600"> Failed </span>
+          {% endif %}
+        </td>
+      </tr>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

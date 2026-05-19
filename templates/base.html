@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Flask Exam Creator</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='tailwind.css') }}" />
+</head>
+
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white shadow">
+        <div class="container mx-auto flex items-center justify-between">
+            <!-- LEFT SIDE -->
+            <div class="flex items-center gap-8">
+                <a href="/" class="flex items-center gap-3">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ExamMaster Logo"
+                        class="h-16 w-16 object-contain rounded" />
+                </a>
+
+                <!-- NAV LINKS -->
+                <div class="flex gap-5">
+                    <a href="/" class="hover:text-gray-200 transition"> Home </a>
+
+                    <a href="/upload" class="hover:text-gray-200 transition">
+                        Upload PDF
+                    </a>
+
+                    <a href="/exams" class="hover:text-gray-200 transition">
+                        Create Exam
+                    </a>
+
+                    <a href="/dashboard" class="hover:text-gray-200 transition">
+                        Dashboard
+                    </a>
+
+                    <a href="/wrong_questions" class="hover:text-gray-200 transition">
+                        Wrong Questions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-10">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %} 
+        {% for msg in messages %}
+        <div class="bg-green-200 p-4 mb-4 rounded">{{ msg }}</div>
+        {% endfor %} 
+        {% endif %} 
+        {% endwith %} 
+        {% block content %} 
+        {% endblock %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-8 rounded shadow">
+    <h1 class="text-3xl font-bold mb-4">
+        Exam Result
+    </h1>
+
+    <p class="mb-2">
+        Correct Answers: {{ correct }}
+    </p>
+    <p class="mb-2">
+        Wrong Answers: {{ wrong }}
+    </p>
+    <p class="mb-4">
+        Score: {{ score }}%
+    </p>
+    {% if passed %}
+        <div class="bg-green-200 p-4 rounded">
+            PASSED
+        </div>
+    {% else %}
+        <div class="bg-red-200 p-4 rounded">
+            FAILED
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
