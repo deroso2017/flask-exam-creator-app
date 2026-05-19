@@ -29,3 +29,6 @@ instance/
 .env
 .env.local
 .env.*.local
+
+# Uploaded PDF files
+uploads/
