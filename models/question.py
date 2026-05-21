@@ -14,6 +14,6 @@ class Question(db.Model):
     option_c = db.Column(db.Text)
     option_d = db.Column(db.Text)
 
-    correct_answer = db.Column(db.String(10))
+    correct_answer = db.Column(db.String(20))
     difficulty = db.Column(db.String(10))
     explanation = db.Column(db.Text)
