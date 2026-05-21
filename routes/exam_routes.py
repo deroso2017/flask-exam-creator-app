@@ -6,6 +6,7 @@ from models.question import Question
 from models.exam_result import ExamResult
 from models.wrong_question import WrongQuestion
 from models.question_attempt import QuestionAttempt
+from models.interesting_question import InterestingQuestion
 
 exam_bp = Blueprint("exam", __name__)
 
@@ -101,6 +102,11 @@ def submit_exam():
     score = round((correct / total) * 100, 2) if total else 0
     passed = score >= 70
 
+    interesting_ids = request.form.getlist("interesting_ids")
+    for qid in interesting_ids:
+        if not InterestingQuestion.query.filter_by(question_id=int(qid)).first():
+            db.session.add(InterestingQuestion(question_id=int(qid)))
+
     exam_result = ExamResult(
         exam_type=request.form.get("exam_type"),
         total_questions=total,
@@ -116,3 +122,11 @@ def submit_exam():
     return render_template(
         "result.html", score=score, passed=passed, correct=correct, wrong=wrong
     )
+
+
+@exam_bp.route("/interesting_questions")
+def interesting_questions():
+    entries = InterestingQuestion.query.all()
+    question_ids = [e.question_id for e in entries]
+    questions = Question.query.filter(Question.id.in_(question_ids)).all()
+    return render_template("interesting_questions.html", questions=questions)

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">⭐ Interesting Questions</h1>
+
+{% if not questions %}
+<p class="text-gray-500">No interesting questions saved yet.</p>
+{% endif %}
+
+{% for q in questions %}
+<div class="bg-white p-6 rounded shadow mb-6">
+    <h2 class="font-bold mb-4">{{ q.question }}</h2>
+
+    <div class="space-y-1 mb-3">
+        {% for letter, text in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
+        <p class="{{ 'text-green-600 font-semibold' if letter in q.correct_answer else 'text-gray-700' }}">
+            {{ letter }}. {{ text }}
+        </p>
+        {% endfor %}
+    </div>
+
+    <p class="text-sm text-green-700 font-medium">Correct: {{ q.correct_answer }}</p>
+
+    {% if q.explanation %}
+    <p class="text-gray-500 text-sm mt-2">{{ q.explanation }}</p>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

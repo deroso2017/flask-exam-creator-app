@@ -36,6 +36,11 @@
 
             <input type="hidden" name="question_ids" value="{{ q.id }}">
 
+            <label class="flex items-center gap-2 text-yellow-500 text-sm mb-3 cursor-pointer">
+                <input type="checkbox" name="interesting_ids" value="{{ q.id }}">
+                ⭐ Mark as interesting
+            </label>
+
             {% set is_multi = ',' in q.correct_answer %}
             {% if is_multi %}
                 <p class="text-sm text-blue-600 font-medium mb-2">Select all that apply</p>
