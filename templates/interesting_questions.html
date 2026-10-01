@@ -5,44 +5,49 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">
-    Wrong Questions
-</h1>
+<h1 class="text-3xl font-bold mb-6">⭐ Interesting Questions</h1>
 
 {% if not questions %}
-<p class="text-gray-500">No wrong questions found.</p>
+<p class="text-gray-500">No interesting questions saved yet.</p>
 {% endif %}
 
 {% for q in questions %}
 <div class="bg-white p-6 rounded shadow mb-6">
-    <h2 class="font-bold mb-4">
-        {{ q.question }}
-    </h2>
+    <h2 class="font-bold mb-4">{{ q.question }}</h2>
 
-    <!-- All Answers -->
     <div class="space-y-1 mb-3">
         {% for letter, text in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
-        <p>
+        <p class="text-gray-700">
             {{ letter }}. {{ text }}
         </p>
         {% endfor %}
     </div>
 
-    <!-- Show/Hide Answer Button -->
+    <!-- Show Answer Button -->
     <button 
         onclick="toggleAnswer('{{ q.id }}')" 
         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-3">
         Show Answer
     </button>
 
-    <!-- Hidden Answer Section by Default -->
+    <!-- Hidden Answer Section -->
     <div id="answer-{{ q.id }}" class="hidden mt-3">
-        <p class="mb-2 text-green-700 font-medium">
-            Correct Answer: {{ q.correct_answer }}
+        <p class="text-sm text-green-700 font-medium">
+            Correct: {{ q.correct_answer }}
         </p>
 
+        <div class="mt-2">
+            {% for letter, text in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
+            {% if letter in q.correct_answer %}
+            <p class="text-green-600 font-semibold">
+                {{ letter }}. {{ text }}
+            </p>
+            {% endif %}
+            {% endfor %}
+        </div>
+
         {% if q.explanation %}
-        <p class="text-gray-600">
+        <p class="text-gray-500 text-sm mt-2">
             Explanation: {{ q.explanation }}
         </p>
         {% endif %}
@@ -53,13 +58,6 @@
 <!-- Pagination -->
 {% if pagination %}
 <div class="flex justify-center items-center gap-4 my-8 font-bold">
-
-    {% if pagination.pages > 2 %}
-    <a href="?page=1"
-       class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-        First
-    </a>
-    {% endif %}
 
     {% if pagination.has_prev %}
     <a href="?page={{ pagination.prev_num }}"
@@ -76,13 +74,6 @@
     <a href="?page={{ pagination.next_num }}"
        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
         Next
-    </a>
-    {% endif %}
-
-    {% if pagination.pages > 2 %}
-    <a href="?page={{ pagination.pages }}"
-       class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-        Last
     </a>
     {% endif %}
 

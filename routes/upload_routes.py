@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from database import db
 from models.exam import Exam
 from models.question import Question
-from services.parser_service import parse_questions_from_pdf
+from services.parser_service import parse_questions_from_pdf, normalize_pdf
 
 upload_bp = Blueprint("upload", __name__)
 
@@ -20,7 +20,6 @@ upload_bp = Blueprint("upload", __name__)
 def upload_pdf():
 
     if request.method == "POST":
-
         pdf = request.files.get("pdf")
 
         if not pdf:
@@ -45,10 +44,19 @@ def upload_pdf():
         db.session.add(exam)
         db.session.flush()  # gives exam.id without full commit
 
+        # NORMALIZE PDF (standardize format, deduplicate, drop malformed questions)
+        normalize_pdf(filepath)
+
         # PARSE PDF
         questions = parse_questions_from_pdf(filepath)
 
-        # CREATE QUESTIONS
+        # CREATE QUESTIONS — skip malformed (missing options or correct answer)
+        questions = [
+            q
+            for q in questions
+            if q["A"] and q["B"] and q["C"] and q["D"] and q["correct"]
+        ]
+
         for q in questions:
             question = Question(
                 exam_id=exam.id,

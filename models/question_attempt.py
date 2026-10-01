@@ -7,8 +7,8 @@ class QuestionAttempt(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(
-        db.Integer, db.ForeignKey("questions.id")  # must match __tablename__
+        db.Integer,
+        db.ForeignKey("questions.id"),  # must match __tablename__ here is questions
     )
-
     is_correct = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

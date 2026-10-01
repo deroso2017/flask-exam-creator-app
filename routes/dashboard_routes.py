@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from models.exam_result import ExamResult
 from models.question import Question
 from models.wrong_question import WrongQuestion
@@ -14,14 +14,15 @@ def dashboard():
 
 @dashboard_bp.route("/wrong_questions")
 def wrong_questions():
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
 
-    wrongs = WrongQuestion.query.all()
-    questions = []
+    query = Question.query.join(
+        WrongQuestion, WrongQuestion.question_id == Question.id
+    ).distinct()
 
-    for w in wrongs:
-        question = Question.query.get(w.question_id)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
-        if question:
-            questions.append(question)
-
-    return render_template("wrong_questions.html", questions=questions)
+    return render_template(
+        "wrong_questions.html", questions=pagination.items, pagination=pagination
+    )

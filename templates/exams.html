@@ -12,7 +12,7 @@
             Select Exam
         </label>
 
-        <select name="exam_id" class="border p-2 w-full mb-5">
+        <select name="exam_id" id="exam_id" class="border p-2 w-full mb-5">
 
             {% for exam in exams %}
                 <option value="{{ exam.id }}">
@@ -27,13 +27,28 @@
             Exam Type
         </label>
 
-        <select name="exam_type" class="border p-2 w-full mb-5">
+        <select name="exam_type" id="exam_type" class="border p-2 w-full mb-5">
 
-            <option value="all">All Questions</option>
-            <option value="wrong">Wrong Questions Only</option>
-            <option value="unanswered">Unanswered Questions</option>
+            <option value="all">All Questions (<span id="count-all">{{ counts.all }}</span>)</option>
+            <option value="wrong">Wrong Questions Only (<span id="count-wrong">{{ counts.wrong }}</span>)</option>
+            <option value="unanswered">Unanswered Questions (<span id="count-unanswered">{{ counts.unanswered }}</span>)</option>
+            <option value="interesting">⭐ Interesting Questions (<span id="count-interesting">{{ counts.interesting }}</span>)</option>
 
         </select>
+
+        <script>
+            document.getElementById('exam_id').addEventListener('change', function () {
+                fetch('/exam_counts/' + this.value)
+                    .then(r => r.json())
+                    .then(data => {
+                        const sel = document.getElementById('exam_type');
+                        sel.options[0].text = `All Questions (${data.all})`;
+                        sel.options[1].text = `Wrong Questions Only (${data.wrong})`;
+                        sel.options[2].text = `Unanswered Questions (${data.unanswered})`;
+                        sel.options[3].text = `⭐ Interesting Questions (${data.interesting})`;
+                    });
+            });
+        </script>
 
         <!-- NUMBER OF QUESTIONS -->
         <label class="block mb-2 font-semibold">
