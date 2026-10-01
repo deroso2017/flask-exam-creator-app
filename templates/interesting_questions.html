@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h1 class="text-3xl font-bold mb-6">⭐ Interesting Questions</h1>
 
@@ -13,17 +17,67 @@
 
     <div class="space-y-1 mb-3">
         {% for letter, text in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
-        <p class="{{ 'text-green-600 font-semibold' if letter in q.correct_answer else 'text-gray-700' }}">
+        <p class="text-gray-700">
             {{ letter }}. {{ text }}
         </p>
         {% endfor %}
     </div>
 
-    <p class="text-sm text-green-700 font-medium">Correct: {{ q.correct_answer }}</p>
+    <!-- Show Answer Button -->
+    <button 
+        onclick="toggleAnswer('{{ q.id }}')" 
+        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-3">
+        Show Answer
+    </button>
 
-    {% if q.explanation %}
-    <p class="text-gray-500 text-sm mt-2">{{ q.explanation }}</p>
-    {% endif %}
+    <!-- Hidden Answer Section -->
+    <div id="answer-{{ q.id }}" class="hidden mt-3">
+        <p class="text-sm text-green-700 font-medium">
+            Correct: {{ q.correct_answer }}
+        </p>
+
+        <div class="mt-2">
+            {% for letter, text in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
+            {% if letter in q.correct_answer %}
+            <p class="text-green-600 font-semibold">
+                {{ letter }}. {{ text }}
+            </p>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if q.explanation %}
+        <p class="text-gray-500 text-sm mt-2">
+            Explanation: {{ q.explanation }}
+        </p>
+        {% endif %}
+    </div>
 </div>
 {% endfor %}
+
+<!-- Pagination -->
+{% if pagination %}
+<div class="flex justify-center items-center gap-4 my-8 font-bold">
+
+    {% if pagination.has_prev %}
+    <a href="?page={{ pagination.prev_num }}"
+       class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+        Prev
+    </a>
+    {% endif %}
+
+    <span class="text-gray-700">
+        Page {{ pagination.page }} of {{ pagination.pages }}
+    </span>
+
+    {% if pagination.has_next %}
+    <a href="?page={{ pagination.next_num }}"
+       class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+        Next
+    </a>
+    {% endif %}
+
+</div>
+{% endif %}
+
 {% endblock %}

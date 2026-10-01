@@ -20,7 +20,6 @@ upload_bp = Blueprint("upload", __name__)
 def upload_pdf():
 
     if request.method == "POST":
-
         pdf = request.files.get("pdf")
 
         if not pdf:
@@ -52,7 +51,11 @@ def upload_pdf():
         questions = parse_questions_from_pdf(filepath)
 
         # CREATE QUESTIONS — skip malformed (missing options or correct answer)
-        questions = [q for q in questions if q["A"] and q["B"] and q["C"] and q["D"] and q["correct"]]
+        questions = [
+            q
+            for q in questions
+            if q["A"] and q["B"] and q["C"] and q["D"] and q["correct"]
+        ]
 
         for q in questions:
             question = Question(

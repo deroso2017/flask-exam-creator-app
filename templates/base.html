@@ -5,6 +5,8 @@
     <title>Flask Exam Creator</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='tailwind.css') }}" />
+
+    {% block scripts %}{% endblock %}
 </head>
 
 <body class="bg-gray-100">
@@ -19,7 +21,9 @@
 
                 <!-- NAV LINKS -->
                 <div class="flex gap-5">
-                    <a href="/" class="hover:text-gray-200 transition"> Home </a>
+                     <a href="/dashboard" class="hover:text-gray-200 transition">
+                        Dashboard
+                    </a>
 
                     <a href="/upload" class="hover:text-gray-200 transition">
                         Upload PDF
@@ -28,11 +32,7 @@
                     <a href="/exams" class="hover:text-gray-200 transition">
                         Create Exam
                     </a>
-
-                    <a href="/dashboard" class="hover:text-gray-200 transition">
-                        Dashboard
-                    </a>
-
+                   
                     <a href="/wrong_questions" class="hover:text-gray-200 transition">
                         Wrong Questions
                     </a>

@@ -41,7 +41,7 @@
                 ⭐ Mark as interesting
             </label>
 
-            {% set is_multi = ',' in q.correct_answer %}
+            {% set is_multi = (',' in q.correct_answer) or ('choose' in q.question|lower and ('two' in q.question|lower or '2' in q.question)) %}
             {% if is_multi %}
                 <p class="text-sm text-blue-600 font-medium mb-2">Select all that apply</p>
             {% endif %}

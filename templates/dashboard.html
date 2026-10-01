@@ -1,16 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="bg-white p-10 rounded shadow">
+    <h1 class="text-4xl font-bold mb-4">
+        Exam Creator App
+    </h1>
+    <p class="text-gray-600">
+        Upload PDFs and generate exams.
+    </p>
+</div>
 <div class="bg-white p-6 rounded shadow">
   <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
 
   <table class="w-full border">
     <thead>
       <tr class="bg-gray-200">
-        <th class="p-3">Date</th>
-        <th class="p-3">Exam Type</th>
-        <th class="p-3">Score</th>
-        <th class="p-3">Result</th>
+        <th class="p-3 text-left">Date</th>
+        <th class="p-3 text-left">Exam Type</th>
+        <th class="p-3 text-left">Score</th>
+        <th class="p-3 text-left">Result</th>
       </tr>
     </thead>
 

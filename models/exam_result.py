@@ -3,7 +3,6 @@ from database import db
 
 
 class ExamResult(db.Model):
-
     __tablename__ = "exam_result"
 
     id = db.Column(db.Integer, primary_key=True)

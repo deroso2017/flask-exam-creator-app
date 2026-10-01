@@ -1,5 +1,5 @@
 import re
-from PyPDF2 import PdfReader
+import fitz  # PyMuPDF
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
@@ -7,9 +7,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 
 # Matches: Q1. / Q97: / Q1 (with text after) — Q-prefixed questions
 Q_PREFIX_PATTERN = re.compile(r"^Q(\d+)[.:]", re.IGNORECASE)
-# Matches: 169. Some question text — bare number >= 100 only when text follows on same line
-# (avoids matching numbered list items like "1. First IP" or "2. Reliability")
-BARE_NUM_PATTERN = re.compile(r"^([1-9]\d{2,})\.\s+\S")
+# Matches: 169. Some question text OR bare "218." alone on a line
+BARE_NUM_PATTERN = re.compile(r"^([1-9]\d{2,})\.(?:\s+\S|\s*$)")
 # Matches both "A." and "a)" style options
 OPTION_PATTERN = re.compile(r"^([A-Da-d])[.)]\s*")
 # Matches "Correct Answer(s): A" or "Correct Answer(s): A, C" or "Correct Answer(s): A and C"
@@ -31,6 +30,11 @@ def _is_question_start(line):
     return bool(Q_PREFIX_PATTERN.match(line)) or bool(BARE_NUM_PATTERN.match(line))
 
 
+def _is_number_only(line):
+    """Return True if line is just a question number, e.g. '218.' or 'Q218.'"""
+    return bool(re.match(r"^(?:Q)?(\d+)[.:]\s*$", line, re.IGNORECASE))
+
+
 def _strip_question_number(line):
     """Remove leading question number from line."""
     line = Q_PREFIX_PATTERN.sub("", line)
@@ -47,13 +51,10 @@ def _normalize_letter(letter):
 
 
 def parse_questions_from_pdf(pdf_path):
-    reader = PdfReader(pdf_path)
-
     raw_text = ""
-    for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            raw_text += text + "\n"
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            raw_text += page.get_text("text") + "\n"
 
     lines = normalize_text(raw_text)
 
@@ -88,9 +89,10 @@ def parse_questions_from_pdf(pdf_path):
             in_explanation = False
             awaiting_correct = False
 
-            line = _strip_question_number(line)
-            if line:
-                current["question"] += line + " "
+            if not _is_number_only(line):
+                line = _strip_question_number(line)
+                if line:
+                    current["question"] += line + " "
             continue
 
         if not current:

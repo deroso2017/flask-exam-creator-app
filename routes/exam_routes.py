@@ -1,5 +1,6 @@
 import random
-from flask import Blueprint, render_template, request
+import re
+from flask import Blueprint, render_template, request, jsonify
 from database import db
 from models.exam import Exam
 from models.question import Question
@@ -11,12 +12,34 @@ from models.interesting_question import InterestingQuestion
 exam_bp = Blueprint("exam", __name__)
 
 
+def get_exam_counts(exam_id):
+    base = Question.query.filter_by(exam_id=exam_id)
+    all_count = base.count()
+
+    wrong_ids = [w[0] for w in db.session.query(WrongQuestion.question_id).distinct().all()]
+    wrong_count = base.filter(Question.id.in_(wrong_ids)).count()
+
+    answered_ids = [a[0] for a in db.session.query(QuestionAttempt.question_id).distinct().all()]
+    unanswered_count = base.filter(~Question.id.in_(answered_ids)).count()
+
+    interesting_ids = [i[0] for i in db.session.query(InterestingQuestion.question_id).distinct().all()]
+    interesting_count = base.filter(Question.id.in_(interesting_ids)).count()
+
+    return {"all": all_count, "wrong": wrong_count, "unanswered": unanswered_count, "interesting": interesting_count}
+
+
+@exam_bp.route("/exam_counts/<int:exam_id>")
+def exam_counts(exam_id):
+    return jsonify(get_exam_counts(exam_id))
+
+
 @exam_bp.route("/exams", methods=["GET", "POST"])
 def exams():
 
     if request.method == "GET":
         exams_list = Exam.query.all()
-        return render_template("exams.html", exams=exams_list)
+        initial_counts = get_exam_counts(exams_list[0].id) if exams_list else {}
+        return render_template("exams.html", exams=exams_list, counts=initial_counts)
 
     exam_id = request.form.get("exam_id")
     exam_type = request.form.get("exam_type", "all")
@@ -46,6 +69,16 @@ def exams():
 
         questions = base_query.filter(~Question.id.in_(answered_ids)).all()
 
+    elif exam_type == "interesting":
+
+        interesting_ids = (
+            db.session.query(InterestingQuestion.question_id).distinct().all()
+        )
+
+        interesting_ids = [i[0] for i in interesting_ids]
+
+        questions = base_query.filter(Question.id.in_(interesting_ids)).all()
+
     else:
         questions = base_query.all()
 
@@ -74,7 +107,8 @@ def submit_exam():
         if not question:
             continue
 
-        selected = request.form.get(f"question_{qid}")
+        selected_list = request.form.getlist(f"question_{qid}")
+        selected = ",".join(sorted(selected_list))
 
         # handle unanswered questions
         if not selected:
@@ -83,7 +117,8 @@ def submit_exam():
             db.session.add(QuestionAttempt(question_id=question.id, is_correct=False))
             continue
 
-        is_correct = selected == question.correct_answer
+        stored = ",".join(sorted(re.findall(r"[A-D]", question.correct_answer.upper())))
+        is_correct = selected == stored
 
         if is_correct:
             correct += 1
@@ -91,7 +126,7 @@ def submit_exam():
             wrong += 1
 
             db.session.add(
-                WrongQuestion(question_id=question.id, selected_answer=selected)
+                WrongQuestion(question_id=question.id, selected_answer=selected or "")
             )
 
         # record attempt (always)
@@ -126,7 +161,15 @@ def submit_exam():
 
 @exam_bp.route("/interesting_questions")
 def interesting_questions():
-    entries = InterestingQuestion.query.all()
-    question_ids = [e.question_id for e in entries]
-    questions = Question.query.filter(Question.id.in_(question_ids)).all()
-    return render_template("interesting_questions.html", questions=questions)
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    query = Question.query.join(
+        InterestingQuestion, InterestingQuestion.question_id == Question.id
+    ).distinct()
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return render_template(
+        "interesting_questions.html", questions=pagination.items, pagination=pagination
+    )
